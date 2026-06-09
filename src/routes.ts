@@ -42,7 +42,8 @@ export function getShareTarget(location: Location): ShareTarget {
   }
 
   if (path === '/share') {
-    const isValidTrip = tripRequiredParams.every((param) => isFiniteCoordinate(search.get(param)));
+    const isValidTrip = isValidCompactTrip(search.get('p'))
+      || tripRequiredParams.every((param) => isFiniteCoordinate(search.get(param)));
 
     return {
       kind: isValidTrip ? 'trip' : 'invalid',
@@ -112,4 +113,25 @@ function withQuery(url: string, query: string) {
 
 function isFiniteCoordinate(value: string | null) {
   return value !== null && Number.isFinite(Number(value));
+}
+
+function isValidCompactTrip(payload: string | null) {
+  if (!payload) {
+    return false;
+  }
+
+  const parts = payload.split('.');
+
+  if (parts.length !== 6 || parts[0] !== '1') {
+    return false;
+  }
+
+  return (
+    parts.slice(1, 5).every(isCompactInteger) &&
+    isCompactInteger(parts[5])
+  );
+}
+
+function isCompactInteger(value: string) {
+  return /^-?[0-9a-z]+$/i.test(value) && Number.isFinite(Number.parseInt(value, 36));
 }

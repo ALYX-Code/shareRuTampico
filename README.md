@@ -23,7 +23,8 @@ para Vercel. En Netlify, `netlify.toml` configura `npm run build` y publica `dis
 
 - `/` muestra la landing general.
 - `/route/:id` muestra una ruta compartida por identificador.
-- `/share?...` conserva compatibilidad con los links actuales generados por la app Expo de RuTampico.
+- `/share?p=...` usa el formato compacto actual para viajes compartidos.
+- `/share?...` con parametros largos conserva compatibilidad con links anteriores.
 
 ## Configuracion
 
