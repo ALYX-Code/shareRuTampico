@@ -7,7 +7,3 @@ export const shareConfig = {
   googlePlayUrl: 'https://play.google.com/store/apps/details?id=com.rutampico.app',
   logoUrl: '/rutampico-icon.png',
 };
-
-export const externalLinks = {
-  supportEmail: 'mailto:hola@rutampico.com',
-};
