@@ -17,7 +17,7 @@ npm run build
 
 El deploy debe servir `dist` como sitio estatico y reenviar cualquier ruta a `index.html`.
 Este repo incluye `public/_redirects` para hosts compatibles con ese formato y `vercel.json`
-para Vercel.
+para Vercel. En Netlify, `netlify.toml` configura `npm run build` y publica `dist`.
 
 ## Rutas soportadas
 
