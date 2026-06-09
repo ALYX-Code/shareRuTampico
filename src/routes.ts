@@ -1,6 +1,6 @@
-import { shareConfig } from './config';
+import { shareConfig } from "./config";
 
-export type ShareKind = 'home' | 'route' | 'trip' | 'invalid';
+export type ShareKind = "home" | "route" | "trip" | "invalid";
 
 export type ShareTarget = {
   kind: ShareKind;
@@ -11,18 +11,23 @@ export type ShareTarget = {
   isValid: boolean;
 };
 
-const tripRequiredParams = ['originLat', 'originLng', 'destinationLat', 'destinationLng'];
+const tripRequiredParams = [
+  "originLat",
+  "originLng",
+  "destinationLat",
+  "destinationLng",
+];
 
 export function getShareTarget(location: Location): ShareTarget {
   const path = normalizePath(location.pathname);
   const search = new URLSearchParams(location.search);
   const routeMatch = path.match(/^\/route\/([^/]+)$/);
 
-  if (path === '/') {
+  if (path === "/") {
     return {
-      kind: 'home',
+      kind: "home",
       path,
-      label: 'RuTampico Share',
+      label: "RuTampico Share",
       search,
       isValid: true,
     };
@@ -32,32 +37,35 @@ export function getShareTarget(location: Location): ShareTarget {
     const routeId = decodeURIComponent(routeMatch[1]);
 
     return {
-      kind: routeId.trim() ? 'route' : 'invalid',
+      kind: routeId.trim() ? "route" : "invalid",
       path,
-      label: routeId.trim() ? `Ruta ${routeId}` : 'Ruta no valida',
+      label: routeId.trim() ? `Ruta ${routeId}` : "Ruta no valida",
       routeId,
       search,
       isValid: Boolean(routeId.trim()),
     };
   }
 
-  if (path === '/share') {
-    const isValidTrip = isValidCompactTrip(search.get('p'))
-      || tripRequiredParams.every((param) => isFiniteCoordinate(search.get(param)));
+  if (path === "/share") {
+    const isValidTrip =
+      isValidCompactTrip(search.get("p")) ||
+      tripRequiredParams.every((param) =>
+        isFiniteCoordinate(search.get(param)),
+      );
 
     return {
-      kind: isValidTrip ? 'trip' : 'invalid',
+      kind: isValidTrip ? "trip" : "invalid",
       path,
-      label: isValidTrip ? 'Ruta compartida' : 'Enlace incompleto',
+      label: isValidTrip ? "Ruta compartida" : "Enlace incompleto",
       search,
       isValid: isValidTrip,
     };
   }
 
   return {
-    kind: 'invalid',
+    kind: "invalid",
     path,
-    label: 'Enlace no disponible',
+    label: "Enlace no disponible",
     search,
     isValid: false,
   };
@@ -66,15 +74,18 @@ export function getShareTarget(location: Location): ShareTarget {
 export function buildAppDeepLink(target: ShareTarget) {
   const query = target.search.toString();
 
-  if (target.kind === 'home') {
+  if (target.kind === "home") {
     return `${shareConfig.appScheme}://`;
   }
 
-  if (target.kind === 'route' && target.routeId) {
-    return withQuery(`${shareConfig.appScheme}://route/${encodeURIComponent(target.routeId)}`, query);
+  if (target.kind === "route" && target.routeId) {
+    return withQuery(
+      `${shareConfig.appScheme}://route/${encodeURIComponent(target.routeId)}`,
+      query,
+    );
   }
 
-  if (target.kind === 'trip') {
+  if (target.kind === "trip") {
     return withQuery(`${shareConfig.appScheme}://share`, query);
   }
 
@@ -84,15 +95,18 @@ export function buildAppDeepLink(target: ShareTarget) {
 export function buildWebFallbackUrl(target: ShareTarget) {
   const query = target.search.toString();
 
-  if (target.kind === 'home') {
+  if (target.kind === "home") {
     return shareConfig.webBaseUrl;
   }
 
-  if (target.kind === 'route' && target.routeId) {
-    return withQuery(`${shareConfig.webBaseUrl}/route/${encodeURIComponent(target.routeId)}`, query);
+  if (target.kind === "route" && target.routeId) {
+    return withQuery(
+      `${shareConfig.webBaseUrl}/route/${encodeURIComponent(target.routeId)}`,
+      query,
+    );
   }
 
-  if (target.kind === 'trip') {
+  if (target.kind === "trip") {
     return withQuery(`${shareConfig.webBaseUrl}/share`, query);
   }
 
@@ -100,11 +114,11 @@ export function buildWebFallbackUrl(target: ShareTarget) {
 }
 
 function normalizePath(pathname: string) {
-  if (!pathname || pathname === '/') {
-    return '/';
+  if (!pathname || pathname === "/") {
+    return "/";
   }
 
-  return pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+  return pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
 }
 
 function withQuery(url: string, query: string) {
@@ -120,18 +134,19 @@ function isValidCompactTrip(payload: string | null) {
     return false;
   }
 
-  const parts = payload.split('.');
+  const parts = payload.split(".");
 
-  if (parts.length !== 6 || parts[0] !== '1') {
+  if (parts.length !== 6 || parts[0] !== "1") {
     return false;
   }
 
   return (
-    parts.slice(1, 5).every(isCompactInteger) &&
-    isCompactInteger(parts[5])
+    parts.slice(1, 5).every(isCompactInteger) && isCompactInteger(parts[5])
   );
 }
 
 function isCompactInteger(value: string) {
-  return /^-?[0-9a-z]+$/i.test(value) && Number.isFinite(Number.parseInt(value, 36));
+  return (
+    /^-?[0-9a-z]+$/i.test(value) && Number.isFinite(Number.parseInt(value, 36))
+  );
 }
